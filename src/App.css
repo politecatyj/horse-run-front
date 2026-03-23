@@ -1,0 +1,188 @@
+/* 전역 스타일 */
+body {
+  margin: 0;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif; /* 더 현대적인 폰트 사용 */
+}
+
+.game-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* 💡 중앙 정렬을 유지하되, 내용물이 많아지면 위아래 여백을 강제합니다. */
+  justify-content: center; 
+  align-items: center;
+  
+  /* 💡 상하단에 60px 정도의 여백을 줍니다. 보드판이 바닥에 붙는걸 막아줘요. */
+  padding: 60px 0; 
+  
+  /* 💡 패딩이 전체 높이에 영향을 주지 않도록 설정합니다. */
+  box-sizing: border-box; 
+  
+  background: radial-gradient(circle at center, #2f2f2f 0%, #1a1a1a 100%);
+  color: white;
+  
+  /* 💡 만약 화면보다 길어지면 자연스럽게 스크롤이 생기도록 합니다. */
+  overflow-y: auto; 
+}
+
+/* --- [강화] UI 패널 디자인 --- */
+.ui-panel {
+  background: rgba(255, 255, 255, 0.05); /* 반투명 배경 */
+  padding: 15px 30px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+  margin-bottom: 40px;
+}
+
+.turn-display {
+  margin: 0 0 8px 0;
+  font-size: 1.8rem; /* 글자 크기 키움 */
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  transition: color 0.3s ease;
+}
+
+/* 턴에 따라 색상 변경 */
+.white-turn {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* 하얀 턴일 때 Subtle Glow */
+}
+
+.black-turn {
+  color: #111111; /* 아주 진한 검정 (가독성을 위해 배경보다 어둡게) */
+  background-color: #f1f1f1; /* 검은 턴일 때만 패널 색상 변경 */
+  border-color: #f1f1f1;
+}
+.black-turn .score-display {
+  color: #333;
+}
+
+.score-display {
+  margin: 0;
+  opacity: 0.8;
+  font-size: 1rem;
+}
+
+/* --- [기본] 보드판 디자인 --- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(11, 56px); /* 타일 크기 살짝 키움 */
+  grid-template-rows: repeat(11, 56px);
+  gap: 1px; /* 타일 사이 미세한 틈 */
+  padding: 20px;
+  background: #3b3b3b;
+  border-radius: 8px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+.tile {
+  width: 56px; height: 56px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  background-color: #2a2a2a; /* 타일 기본 배경 */
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tile:hover {
+  background-color: rgba(255,255,255,0.05); /* 호버 효과 */
+}
+
+/* 타일 점 디자인 */
+.tile::before {
+  content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%;
+  background: #d9b84e; z-index: 1;
+  opacity: 0.7;
+}
+
+.tile.grassland::before { background: #4ecf63; }
+.tile.oasis::before { width: 34px; height: 34px; background: #52cfff; opacity: 1; }
+
+/* 선택된 타일 */
+.tile.selected {
+  outline: 3px solid #00f2ff;
+  outline-offset: -3px;
+  background-color: rgba(0, 242, 255, 0.2);
+}
+
+/* --- [강화] 말 이미지 그림자 --- */
+.horse-img {
+  width: 52px; height: 52px;
+  object-fit: contain;
+  z-index: 10;
+  pointer-events: none;
+  /* 💡 drop-shadow를 사용하여 PNG 이미지의 투명도에 맞춰 그림자를 넣습니다 */
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.7));
+  transition: transform 0.1s ease;
+}
+
+.tile.selected .horse-img {
+  transform: scale(1.1); /* 선택되면 살짝 커짐 */
+}
+
+/* --- [추가] 규칙 툴팁 박스 디자인 --- */
+.rule-box {
+  position: relative;
+  display: inline-block;
+  margin-top: 15px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #ccc;
+  cursor: help; /* 마우스 커서가 물음표 모양으로 바뀜 */
+  transition: all 0.2s;
+}
+
+.rule-box:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* 숨겨져 있는 툴팁 내용 */
+.rule-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 100%; /* 박스 바로 아래에 위치 */
+  left: 50%;
+  transform: translateX(-50%) translateY(15px); /* 처음에 살짝 아래로 내려가 있음 */
+  width: 260px;
+  background: #222;
+  color: #fff;
+  text-align: left;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+  z-index: 100; /* 보드판 위에 무조건 표시되도록 설정 */
+  pointer-events: none; /* 툴팁 위로 마우스가 가도 깜빡이지 않게 방지 */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 스르륵 올라오는 애니메이션 */
+}
+
+.rule-tooltip ul {
+  padding-left: 20px;
+  margin: 10px 0 0 0;
+  line-height: 1.5;
+}
+
+.rule-tooltip li {
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: #ddd;
+}
+
+.rule-tooltip strong {
+  color: #00f2ff; /* 강조 포인트 색상 */
+}
+
+/* 💡 핵심: 마우스를 올렸을 때(Hover) 툴팁이 보이게 함 */
+.rule-box:hover .rule-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(8px); /* 살짝 위로 떠오르는 효과 */
+}
